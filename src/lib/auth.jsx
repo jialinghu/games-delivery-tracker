@@ -28,7 +28,13 @@ export function AuthProvider({ children }) {
       if (session?.user) loadProfile(session.user)
       setLoading(false)
     }).catch((err) => {
+      console.error("Auth error:", err)
+      setLoading(false)
+    }).catch((err) => {
       console.error("Auth session error:", err)
+      setLoading(false)
+    }).catch((err) => {
+      console.error("Auth error:", err)
       setLoading(false)
     })
 
