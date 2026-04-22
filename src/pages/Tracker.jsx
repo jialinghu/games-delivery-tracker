@@ -348,7 +348,7 @@ export default function Tracker() {
 
   // Load from Supabase
   useEffect(() => {
-   async function load() {
+    async function load() {
       try {
         const [sp, fl, ts] = await Promise.all([db.fetchSpaces(), db.fetchFolders(), db.fetchTasks()])
         if (sp.length) setSpaces(sp)
@@ -359,6 +359,8 @@ export default function Tracker() {
       }
       setLoaded(true)
     }
+    load()
+  }, [])
 
   const assignees = useMemo(() => {
     const s = new Set(tasks.map(t => t.assignee))
