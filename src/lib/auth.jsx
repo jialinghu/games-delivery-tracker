@@ -3,6 +3,14 @@ import { supabase } from './supabase'
 
 const AuthContext = createContext(null)
 
+function clearBadSession() {
+  try {
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('sb-')) localStorage.removeItem(k)
+    })
+  } catch (e) {}
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -25,13 +33,16 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!supabase) {
-      console.warn('No Supabase client')
       setLoading(false)
       return
     }
 
     const timeout = setTimeout(() => {
-      console.warn('Auth timeout - forcing past loading')
+      console.warn('Auth timeout - clearing bad session')
+      clearBadSession()
+      supabase.auth.signOut().catch(() => {})
+      setUser(null)
+      setProfile(null)
       setLoading(false)
     }, 5000)
 
@@ -42,7 +53,8 @@ export function AuthProvider({ children }) {
       setLoading(false)
     }).catch((err) => {
       clearTimeout(timeout)
-      console.error('Auth session error:', err)
+      console.error('Auth error:', err)
+      clearBadSession()
       setLoading(false)
     })
 
@@ -66,12 +78,13 @@ export function AuthProvider({ children }) {
   async function signOut() {
     if (!supabase) return
     await supabase.auth.signOut()
+    clearBadSession()
     setUser(null)
     setProfile(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signOut, isAdmin: profile?.role === 'admin' }}>
+    <AuthContext.Provider value={{ user, profile, loading, signIn, signOut, isAdmin: profile?.role === "admin" }}>
       {children}
     </AuthContext.Provider>
   )
