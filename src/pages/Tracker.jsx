@@ -346,8 +346,13 @@ export default function Tracker() {
   const [sm, setSm] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
-  // Load from Supabase
+  // Load from Supabase with timeout
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      console.warn('Data load timeout - showing empty tracker')
+      setLoaded(true)
+    }, 5000)
+
     async function load() {
       try {
         const [sp, fl, ts] = await Promise.all([db.fetchSpaces(), db.fetchFolders(), db.fetchTasks()])
@@ -357,6 +362,7 @@ export default function Tracker() {
       } catch (err) {
         console.error('Failed to load data:', err)
       }
+      clearTimeout(timeout)
       setLoaded(true)
     }
     load()
