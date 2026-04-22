@@ -348,15 +348,17 @@ export default function Tracker() {
 
   // Load from Supabase
   useEffect(() => {
-    async function load() {
-      const [sp, fl, ts] = await Promise.all([db.fetchSpaces(), db.fetchFolders(), db.fetchTasks()])
-      if (sp.length) setSpaces(sp)
-      if (fl.length) setFolders(fl)
-      if (ts.length) setTasks(ts)
+   async function load() {
+      try {
+        const [sp, fl, ts] = await Promise.all([db.fetchSpaces(), db.fetchFolders(), db.fetchTasks()])
+        if (sp.length) setSpaces(sp)
+        if (fl.length) setFolders(fl)
+        if (ts.length) setTasks(ts)
+      } catch (err) {
+        console.error('Failed to load data:', err)
+      }
       setLoaded(true)
     }
-    load()
-  }, [])
 
   const assignees = useMemo(() => {
     const s = new Set(tasks.map(t => t.assignee))
