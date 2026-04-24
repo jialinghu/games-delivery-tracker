@@ -345,28 +345,24 @@ export default function Tracker() {
   const [mt, setMt] = useState(null)
   const [sm, setSm] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [loadError, setLoadError] = useState(false)
 
-  // Load from Supabase with timeout
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      console.warn('Data load timeout - showing empty tracker')
+  const loadData = useCallback(async () => {
+    setLoadError(false)
+    setLoaded(false)
+    try {
+      const [sp, fl, ts] = await Promise.all([db.fetchSpaces(), db.fetchFolders(), db.fetchTasks()])
+      if (sp.length) setSpaces(sp)
+      if (fl.length) setFolders(fl)
+      if (ts.length) setTasks(ts)
       setLoaded(true)
-    }, 20000)
-
-    async function load() {
-      try {
-        const [sp, fl, ts] = await Promise.all([db.fetchSpaces(), db.fetchFolders(), db.fetchTasks()])
-        if (sp.length) setSpaces(sp)
-        if (fl.length) setFolders(fl)
-        if (ts.length) setTasks(ts)
-      } catch (err) {
-        console.error('Failed to load data:', err)
-      }
-      clearTimeout(timeout)
-      setLoaded(true)
+    } catch (err) {
+      console.error('Failed to load data:', err)
+      setLoadError(true)
     }
-    load()
   }, [])
+
+  useEffect(() => { loadData() }, [loadData])
 
   const assignees = useMemo(() => {
     const s = new Set(tasks.map(t => t.assignee))
@@ -443,7 +439,13 @@ export default function Tracker() {
     return { o, w, d, t: filt.length }
   }, [filt])
 
-  if (!loaded) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: PLX, color: C.textSec }}>Loading data…</div>
+  if (loadError) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: PLX, color: C.textSec, gap: 16 }}>
+      <div>無法連接到伺服器，請稍後再試</div>
+      <button onClick={loadData} style={{ padding: '8px 24px', background: C.interactive, color: '#fff', border: 'none', borderRadius: 4, fontFamily: PLX, fontSize: 14, cursor: 'pointer' }}>重試</button>
+    </div>
+  )
+  if (!loaded) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: PLX, color: C.textSec }}>連接中，請稍候…</div>
 
   const tabs = [{ key: 'list', label: 'List' }, { key: 'kanban', label: 'Board' }, { key: 'timeline', label: 'Timeline' }]
 

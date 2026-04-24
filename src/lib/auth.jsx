@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
       setUser(null)
       setProfile(null)
       setLoading(false)
-    }, 15000)
+    }, 30000)
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       clearTimeout(timeout)
