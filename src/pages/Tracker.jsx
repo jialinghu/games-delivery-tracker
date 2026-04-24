@@ -351,7 +351,7 @@ export default function Tracker() {
     const timeout = setTimeout(() => {
       console.warn('Data load timeout - showing empty tracker')
       setLoaded(true)
-    }, 5000)
+    }, 20000)
 
     async function load() {
       try {

@@ -3,33 +3,38 @@ import { supabase } from './supabase'
 // ─── SPACES ────────────────────────────────────────────────────
 export async function fetchSpaces() {
   if (!supabase) return []
-  const { data } = await supabase.from('spaces').select('*').order('created_at')
+  const { data, error } = await supabase.from('spaces').select('*').order('created_at')
+  if (error) console.error('[db] fetchSpaces error:', error)
   return data || []
 }
 
 export async function createSpace(space) {
   if (!supabase) return null
-  const { data } = await supabase.from('spaces').insert(space).select().single()
+  const { data, error } = await supabase.from('spaces').insert(space).select().single()
+  if (error) console.error('[db] createSpace error:', error)
   return data
 }
 
 // ─── FOLDERS ───────────────────────────────────────────────────
 export async function fetchFolders() {
   if (!supabase) return []
-  const { data } = await supabase.from('folders').select('*').order('created_at')
+  const { data, error } = await supabase.from('folders').select('*').order('created_at')
+  if (error) console.error('[db] fetchFolders error:', error)
   return data || []
 }
 
 export async function createFolder(folder) {
   if (!supabase) return null
-  const { data } = await supabase.from('folders').insert(folder).select().single()
+  const { data, error } = await supabase.from('folders').insert(folder).select().single()
+  if (error) console.error('[db] createFolder error:', error)
   return data
 }
 
 // ─── TASKS ─────────────────────────────────────────────────────
 export async function fetchTasks() {
   if (!supabase) return []
-  const { data } = await supabase.from('tasks').select('*').order('due_date')
+  const { data, error } = await supabase.from('tasks').select('*').order('due_date')
+  if (error) console.error('[db] fetchTasks error:', error)
   return data || []
 }
 

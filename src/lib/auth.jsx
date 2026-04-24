@@ -38,13 +38,11 @@ export function AuthProvider({ children }) {
     }
 
     const timeout = setTimeout(() => {
-      console.warn('Auth timeout - clearing bad session')
-      clearBadSession()
-      supabase.auth.signOut().catch(() => {})
+      console.warn('Auth timeout - Supabase slow, proceeding as logged out')
       setUser(null)
       setProfile(null)
       setLoading(false)
-    }, 5000)
+    }, 15000)
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       clearTimeout(timeout)
